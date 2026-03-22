@@ -1,4 +1,4 @@
-package com.example.backend.services;
+package com.example.backend;
 
 import org.apache.pdfbox.Loader;
 import com.example.backend.entities.User;
