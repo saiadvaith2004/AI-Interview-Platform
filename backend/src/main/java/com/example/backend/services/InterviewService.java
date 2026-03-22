@@ -72,30 +72,38 @@ public class InterviewService {
      * from GeminiService are used — so the interview ALWAYS starts successfully.
      */
     private String generateAndSaveQuestions(String topic) {
-        String prompt = "You are a senior technical interviewer with knowledge of current " +
-                "industry hiring trends in 2024-2025. Generate exactly 5 interview questions " +
-                "for the topic: " + topic + ". " +
-                "Questions must reflect real skills currently in demand in the job market. " +
-                "Mix of Technical, Behavioral, and Scenario-based questions. " +
-                "Return ONLY a valid JSON array of 5 question strings, no extra text, no markdown. " +
+        String prompt = "You are a strict technical interviewer. " +
+                "Generate exactly 5 interview questions ONLY about: " + topic + ". " +
+                "STRICT RULES - DO NOT BREAK THESE: " +
+                "1. ALL 5 questions MUST be about " + topic + " ONLY. " +
+                "2. DO NOT ask about OOP, OOPS concepts unless the topic itself is OOP. " +
+                "3. DO NOT ask behavioral, HR, or resume-based questions. " +
+                "4. DO NOT mix other programming languages or topics. " +
+                "5. If topic is SQL - ask ONLY about SQL queries, joins, indexes, transactions, normalization etc. " +
+                "6. If topic is Java - ask ONLY about Java language features, JVM, collections, etc. " +
+                "7. If topic is Python - ask ONLY about Python language features, libraries, etc. " +
+                "8. If topic is DSA - ask ONLY about data structures and algorithms. " +
+                "9. If topic is Spring - ask ONLY about Spring Boot, Spring MVC, Spring Security etc. " +
+                "10. Questions must be purely technical and specific to " + topic + " in 2024-2025. " +
+                "Return ONLY a valid JSON array of exactly 5 question strings, no markdown, no extra text. " +
                 "Example: [\"Question 1?\", \"Question 2?\", \"Question 3?\", \"Question 4?\", \"Question 5?\"]";
 
-        // GeminiService handles retries and fallback internally
         String questionsJson = geminiService.generateRaw(prompt);
 
-        // Save to DB as SYSTEM entry for future reuse
+        // ✅ Only save to DB if questions are valid and not empty
         try {
-            Interview systemEntry = new Interview();
-            systemEntry.setUsername("SYSTEM");
-            systemEntry.setTopic(topic.toLowerCase());
-            systemEntry.setStatus("SYSTEM");
-            systemEntry.setIsApproved(true);
-            systemEntry.setUsageCount(0);
-            systemEntry.setStartedAt(LocalDateTime.now());
-            systemEntry.setQuestionsJson(questionsJson);
-            interviewRepository.save(systemEntry);
+            if (questionsJson != null && !questionsJson.equals("[]") && questionsJson.contains("?")) {
+                Interview systemEntry = new Interview();
+                systemEntry.setUsername("SYSTEM");
+                systemEntry.setTopic(topic.toLowerCase());
+                systemEntry.setStatus("SYSTEM");
+                systemEntry.setIsApproved(true);
+                systemEntry.setUsageCount(0);
+                systemEntry.setStartedAt(LocalDateTime.now());
+                systemEntry.setQuestionsJson(questionsJson);
+                interviewRepository.save(systemEntry);
+            }
         } catch (Exception e) {
-            // ✅ If saving fails, still continue — don't crash the interview
             System.err.println("Failed to save SYSTEM questions to DB: " + e.getMessage());
         }
 
