@@ -23,13 +23,7 @@ public class GeminiService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     // ✅ Fallback questions used ONLY if Gemini completely fails after retries
-    private static final String FALLBACK_QUESTIONS = """
-            ["Explain the core concepts of object-oriented programming with examples.",
-             "Describe a challenging technical problem you solved and your approach.",
-             "How do you ensure code quality and maintainability in your projects?",
-             "Explain the difference between synchronous and asynchronous programming.",
-             "How would you design a scalable REST API for a large application?"]
-            """;
+    private static final String FALLBACK_QUESTIONS = "[]";
 
     public String generateRaw(String prompt) {
         try {
@@ -61,6 +55,7 @@ public class GeminiService {
         } catch (Exception e) {
             // ✅ If Gemini fails after all retries, return fallback questions
             System.err.println("Gemini generateRaw failed after retries: " + e.getMessage());
+            e.printStackTrace();
             return FALLBACK_QUESTIONS;
         }
     }
