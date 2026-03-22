@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
 import InterviewSetup from './pages/InterviewSetup';
 import Interview from './pages/Interview';
@@ -19,8 +18,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<AuthPage />} />
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         <Route path="/interview/setup" element={<PrivateRoute><InterviewSetup /></PrivateRoute>} />
         <Route path="/interview/:id" element={<PrivateRoute><Interview /></PrivateRoute>} />
