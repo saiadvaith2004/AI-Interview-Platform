@@ -1,5 +1,4 @@
-package com.example.backend;
-
+package com.example.backend.services;
 import org.apache.pdfbox.Loader;
 import com.example.backend.entities.User;
 import com.example.backend.repositories.UserRepository;
