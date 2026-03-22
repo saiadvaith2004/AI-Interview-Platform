@@ -1,3 +1,4 @@
-backend/target/
-target/
-*.class
+backend/target/target/*.class
+
+
+backend/src/main/resources/application.yml
