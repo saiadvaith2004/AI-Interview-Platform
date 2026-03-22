@@ -1,5 +1,6 @@
 package com.example.backend.controllers;
 
+import org.springframework.http.HttpStatus;
 import com.example.backend.entities.User;
 import com.example.backend.repositories.UserRepository;
 import com.example.backend.security.JwtUtil;
