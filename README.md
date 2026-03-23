@@ -1,4 +1,4 @@
-                                                            AI Interview Platform
+                                   AI Interview Platform
 AI Interview Platform is a comprehensive Java full-stack web application designed specifically for software engineering aspirants preparing for technical interviews at top IT companies like Infosys, TCS, and Cognizant. Built with Spring Boot, React, and MySQL, it provides AI-powered mock interviews with personalized Java, DSA, SQL questions, real-time feedback, and performance analytics to help you ace your coding interviews.
 
 ✨ Features
