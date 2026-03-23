@@ -51,9 +51,8 @@ npm install
 npm run dev
 Access the platform
 
-Backend API: http://localhost:8080
-
-Frontend: http://localhost:3000
+Backend API: http://localhost:<backend-port-number>
+Frontend: http://localhost:<frontend-port-number>
 
 📁 Project Structure
 text
@@ -75,7 +74,7 @@ Create .env files in both frontend and backend:
 Backend application.properties:
 
 text
-spring.datasource.url=jdbc:mysql://localhost:3306/interview_platform
+spring.datasource.url=jdbc:mysql://localhost:<port_number>/interview_platform
 spring.datasource.username=your_username
 spring.datasource.password=your_password
 gemini.api.key=your_gemini_api_key
