@@ -1,0 +1,70 @@
+{
+  "info": {
+    "name": "AI Interview Platform Auth",
+    "_postman_id": "auth-collection-2026",
+    "description": "Collection for testing /auth/register and /auth/login on live backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"newuser12345\",\n  \"password\": \"password123\",\n  \"email\": \"newuser12345@gmail.com\"\n}"
+        },
+        "url": {
+          "raw": "https://ai-interview-platform-8ptv.onrender.com/auth/register",
+          "protocol": "https",
+          "host": [
+            "ai-interview-platform-8ptv",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"newuser12345\",\n  \"password\": \"password123\"\n}"
+        },
+        "url": {
+          "raw": "https://ai-interview-platform-8ptv.onrender.com/auth/login",
+          "protocol": "https",
+          "host": [
+            "ai-interview-platform-8ptv",
+            "onrender",
+            "com"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

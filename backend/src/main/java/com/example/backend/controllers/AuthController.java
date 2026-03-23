@@ -27,7 +27,9 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already exists");
+            return ResponseEntity
+                .status(HttpStatus.CONFLICT) // ✅ 409
+                .body("User already exists");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
