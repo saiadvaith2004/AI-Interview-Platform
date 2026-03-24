@@ -1,5 +1,7 @@
 package com.example.backend.entities;
 
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import jakarta.persistence.*;
 
 @Entity
