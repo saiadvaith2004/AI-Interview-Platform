@@ -1,260 +1,104 @@
-# 🎯 AI-Powered Mock Interview Platform
+                                         AI Interview Platform
+AI Interview Platform is a comprehensive Java full-stack web application designed specifically for software engineering aspirants preparing for technical interviews at top IT companies like Infosys, TCS, and Cognizant. Built with Spring Boot, React, and MySQL, it provides AI-powered mock interviews with personalized Java, DSA, SQL questions, real-time feedback, and performance analytics to help you ace your coding interviews.
 
-A sophisticated interview simulation system that adapts to candidate performance in real-time, providing objective evaluation and actionable feedback - just like a real interviewer.
+✨ Features
+AI-Powered Questions: Context-aware interview questions on Java, Data Structures, Algorithms, SQL, and System Design
 
-## 🌟 Features
+Mock Interview Mode: Timed sessions simulating real interview pressure
 
-### Core Capabilities
+Smart Feedback: Detailed code reviews and improvement suggestions
 
-- **📄 Intelligent Resume & JD Analysis**
-  - Extracts skills, experience, and projects from resume
-  - Identifies role requirements and technical stack from job description
-  - Aligns questions with candidate profile and job needs
+Progress Tracking: Performance analytics and weak area identification
 
-- **🎲 Adaptive Question System**
-  - 4 Question Categories: Technical, Behavioral, Scenario-based, Conceptual
-  - 3 Difficulty Levels: Easy → Medium → Hard
-  - Dynamic difficulty adjustment based on performance
-  - 40+ diverse questions across all categories
+Role-Specific: Tailored questions for SDE-1, SDE-2, Backend Developer roles
 
-- **⏱️ Strict Time Management**
-  - Fixed time limits per question (90-180 seconds)
-  - Real-time countdown timer
-  - Automatic submission on timeout
-  - Time efficiency scoring with penalties/bonuses
+Responsive Design: Works perfectly on desktop and mobile
 
-- **📊 Objective Evaluation System**
-  - Quality scoring based on depth, relevance, and structure
-  - Keyword matching for technical accuracy
-  - Response structure analysis (examples, explanations)
-  - Time efficiency metrics
+Live Link: https://ai-interview-platform-ten-gray.vercel.app/login
 
-- **🚨 Early Termination Logic**
-  - Monitors performance after minimum 3 questions
-  - Terminates if average score < 30%
-  - Clear feedback on termination reasons
+🛠 Tech Stack
+Component	Technologies
+Frontend	React.js, Tailwind CSS, Axios
+Backend	Spring Boot, Hibernate/JPA, Spring Security
+Database	MySQL 8.0
+AI/ML	Google Gemini API / Ollama
+Build Tools	Maven, Vite/NPM
+Authentication	JWT Tokens
+Deployment	Docker (optional)
+🚀 Quick Start
+Clone the repository
 
-- **📈 Comprehensive Final Report**
-  - Interview Readiness Score (0-100)
-  - Skill area breakdown (Technical, Behavioral, etc.)
-  - Strengths and weaknesses identification
-  - Actionable improvement feedback
-  - Hiring readiness indicator
+bash
+git clone https://github.com/saiadvaith2004/AI-Interview-Platform.git
+cd AI-Interview-Platform
+Backend Setup
 
-## 🚀 Quick Start
+bash
+cd backend
+# Copy example config
+cp src/main/resources/application-example.properties src/main/resources/application.properties
+# Update database credentials in application.properties
+mvn clean install
+mvn spring-boot:run
+Database Setup
 
-### Prerequisites
+sql
+CREATE DATABASE interview_platform;
+# Run schema.sql if provided
+Frontend Setup
 
-- Node.js 16+ installed
-- npm or yarn package manager
-
-### Installation
-
-1. **Extract the project files**
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-4. **Open your browser**
-   ```
-   http://localhost:3000
-   ```
-
-## 📖 How to Use
-
-### Step 1: Setup
-1. Paste your resume in the first text area
-2. Paste the target job description in the second text area
-3. Or click "Load Sample Resume & Job Description" to try with demo data
-4. Click "Start Interview"
-
-### Step 2: Interview
-1. Read each question carefully
-2. Type your answer in the text area
-3. Watch the timer - you have 90-180 seconds per question
-4. Click "Submit Answer" or let it auto-submit on timeout
-5. Review your evaluation feedback
-6. Proceed to the next question
-
-### Step 3: Results
-1. View your overall Interview Readiness Score
-2. Analyze performance by skill area
-3. Review strengths and weaknesses
-4. Read actionable feedback for improvement
-5. Check hiring readiness indicator
-
-## 🛠️ Technology Stack
-
-### Frontend
-- **React 18** - UI framework
-- **Tailwind CSS** - Styling
-- **Lucide React** - Icons
-- **Vite** - Build tool
-
-### Architecture
-- **Client-side only** - No backend required
-- **Pure JavaScript algorithms** - All evaluation logic runs in browser
-- **Rule-based AI** - Sophisticated scoring without API calls
-
-## 📁 Project Structure
-
-```
-ai-mock-interview-platform/
-├── src/
-│   ├── components/
-│   │   └── MockInterviewPlatform.jsx    # Main component
-│   ├── utils/
-│   │   └── InterviewEngine.js           # Core interview logic
-│   ├── App.jsx                           # App wrapper
-│   ├── main.jsx                          # Entry point
-│   └── index.css                         # Global styles
-├── index.html                            # HTML template
-├── package.json                          # Dependencies
-├── vite.config.js                        # Vite configuration
-├── tailwind.config.js                    # Tailwind configuration
-├── postcss.config.js                     # PostCSS configuration
-└── README.md                             # This file
-```
-
-## 🎯 Interview Engine Logic
-
-### Resume Parser
-- Extracts skills using keyword matching
-- Identifies years of experience with regex
-- Finds projects and accomplishments
-
-### Job Description Parser
-- Determines role type (Frontend, Backend, Full Stack, etc.)
-- Extracts required skills and technologies
-- Identifies experience level (Junior, Mid, Senior)
-
-### Question Selection
-- Chooses from 40+ pre-defined questions
-- Balances categories across interview
-- Adjusts difficulty based on performance
-
-### Evaluation Algorithm
-```javascript
-Quality Score (0-100%) = 
-  Base Score (50%) +
-  Word Count Assessment (±20%) +
-  Keyword Relevance (20%) +
-  Structure Indicators (20%) +
-  Technical/Behavioral Depth (15%)
-
-Final Score = Quality × Base Points × Time Efficiency
-```
-
-### Adaptive Difficulty
-- **Increase**: Average score > 75% → next difficulty level
-- **Decrease**: Average score < 50% → previous difficulty level
-- **Maintain**: Average score 50-75% → same difficulty level
-
-### Early Termination
-- Triggers after 3+ questions
-- Average score < 30% threshold
-- Provides clear improvement recommendations
-
-## 🎨 Customization
-
-### Modify Questions
-Edit `src/utils/InterviewEngine.js` → `selectQuestion()` method
-
-### Change Difficulty Thresholds
-Edit `src/utils/InterviewEngine.js` → `adaptDifficulty()` method
-
-### Adjust Time Limits
-Modify the `time` property in question objects
-
-### Update Scoring Logic
-Edit `src/utils/InterviewEngine.js` → `evaluateQuality()` method
-
-## 🔧 Available Scripts
-
-```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run preview  # Preview production build
-```
-
-## 📊 Evaluation Criteria
-
-### Quality Metrics
-- **Depth**: Comprehensive explanations
-- **Relevance**: Keyword matching with question
-- **Structure**: Examples, explanations, logical flow
-- **Technical Accuracy**: Appropriate terminology usage
-
-### Time Efficiency
-- **On-time**: Full score (100%)
-- **Quick & Quality**: Bonus (120%)
-- **Overtime**: Penalty (50%)
-
-### Performance Categories
-- **Strong (75-100%)**: Ready to Hire
-- **Average (50-74%)**: Conditional - Needs Development
-- **Needs Improvement (<50%)**: Not Ready
-
-## 🎓 Best Practices for Candidates
-
-1. **Be Specific**: Use concrete examples from your experience
-2. **Structure Your Answers**: Problem → Approach → Solution → Result
-3. **Manage Time**: Aim for 60-80% of allocated time
-4. **Show Depth**: Explain the "why" behind your decisions
-5. **Stay Relevant**: Address all parts of the question
-
-## 🐛 Troubleshooting
-
-### Issue: App won't start
-```bash
-# Clear node_modules and reinstall
-rm -rf node_modules package-lock.json
+bash
+cd ../frontend
 npm install
 npm run dev
-```
+Access the platform
 
-### Issue: Styling not applied
-```bash
-# Rebuild Tailwind
-npm run dev
-```
+Backend API: http://localhost:<backend-port-number>
+Frontend: http://localhost:<frontend-port-number>
 
-### Issue: Timer not working
-- Check browser console for errors
-- Ensure JavaScript is enabled
+📁 Project Structure
+text
+AI-Interview-Platform/
+├── backend/                 # Spring Boot API
+│   ├── src/main/java/
+│   │   └── com/interview/
+│   ├── src/main/resources/
+│   └── pom.xml
+├── frontend/                # React App
+│   ├── src/
+│   ├── public/
+│   └── package.json
+├── docs/                    # API Documentation
+└── README.md
+🔧 Environment Variables
+Create .env files in both frontend and backend:
 
-## 📝 License
+Backend application.properties:
 
-MIT License - Free to use and modify
+text
+spring.datasource.url=jdbc:mysql://localhost:<port_number>/interview_platform
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+gemini.api.key=your_gemini_api_key
+jwt.secret=your_jwt_secret
+🎯 For Contributors
+Fork the repository
 
-## 🤝 Contributing
+Create feature branch (git checkout -b feature/amazing-feature)
 
-This is a demonstration project. Feel free to fork and customize for your needs!
+Commit changes (git commit -m 'Add amazing feature')
 
-## 💡 Future Enhancements
+Push to branch (git push origin feature/amazing-feature)
 
-Potential additions:
-- Real AI integration (Claude/GPT APIs)
-- User authentication and history
-- Database storage for interviews
-- Analytics dashboard
-- Custom question banks
-- Video/audio interview mode
-- Multi-language support
+Open Pull Request
 
-## 📧 Support
+📄 License
+This project is licensed under the MIT License.
 
-For issues or questions, please check the code comments or create an issue in the repository.
 
----
+## Deployment
 
-**Built with ❤️ to help candidates ace their interviews!**
+- **Backend Deployment**: Render
+- **Frontend Deployment**: Vercel
+- **Database Deployment**: Railway
 
-<video controls src="Screen Recording 2026-02-01 181002-1.mp4" title="Recorded Video"></video>
