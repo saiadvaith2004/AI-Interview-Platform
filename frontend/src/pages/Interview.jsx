@@ -167,7 +167,7 @@ export default function Interview() {
     }
     timerRef.current = setTimeout(() => setTimeLeft(t => t - 1), 1000);
     return () => clearTimeout(timerRef.current);
-  }, [timeLeft]);
+  }, [timeLeft, current, questions.length]);
 
   // Total countdown
   useEffect(() => {
@@ -197,6 +197,22 @@ export default function Interview() {
 
   const handlePrev = () => {
     if (current > 0) setCurrent(current - 1);
+  };
+
+  // --- NEW: HANDLE EXIT LOGIC ---
+  const handleExit = () => {
+    const confirmExit = window.confirm(
+      "Are you sure you want to exit?"
+    );
+    
+    if (confirmExit) {
+      clearTimeout(timerRef.current);
+      // Ensure we leave fullscreen before navigating back
+      if (document.exitFullscreen && document.fullscreenElement) {
+        document.exitFullscreen();
+      }
+      navigate('/dashboard');
+    }
   };
 
   const handleSubmit = async () => {
@@ -233,6 +249,13 @@ export default function Interview() {
             </p>
             <button style={styles.btnFullscreen} onClick={reenterFullscreen}>
               ⛶ Return to Fullscreen
+            </button>
+            {/* Added Exit option inside the modal just in case they are stuck */}
+            <button 
+              style={{ ...styles.btnExit, background: 'none', border: 'none', color: '#6b7280', marginTop: '10px' }} 
+              onClick={handleExit}
+            >
+              Exit session
             </button>
           </div>
         </div>
@@ -346,6 +369,11 @@ export default function Interview() {
 
         {/* Buttons */}
         <div style={styles.buttons}>
+          {/* NEW: EXIT BUTTON */}
+          <button style={styles.btnExit} onClick={handleExit}>
+            ✕ Exit
+          </button>
+
           <button style={styles.btnSecondary} onClick={handlePrev} disabled={current === 0}>
             ← Previous
           </button>
@@ -396,9 +424,32 @@ const styles = {
   textarea: { padding: '0.75rem', borderRadius: '8px', border: '1px solid #ddd', fontSize: '1rem', resize: 'vertical', fontFamily: 'inherit' },
   dots: { display: 'flex', gap: '0.5rem', justifyContent: 'center' },
   dot: { width: '12px', height: '12px', borderRadius: '50%', transition: 'background 0.2s' },
-  buttons: { display: 'flex', gap: '1rem' },
-  btnPrimary: { flex: 1, padding: '0.75rem', background: '#4f46e5', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1rem', cursor: 'pointer' },
+  buttons: { display: 'flex', gap: '0.5rem' }, // Reduced gap slightly for 3-button layout
+  btnExit: { 
+    padding: '0.75rem 1.25rem', 
+    background: '#fee2e2', // Light red background
+    color: '#dc2626',      // Dark red text
+    border: '1px solid #fecaca', 
+    borderRadius: '8px', 
+    fontSize: '0.9rem', 
+    cursor: 'pointer', 
+    fontWeight: '600',
+    transition: 'all 0.2s'
+  },
+  btnPrimary: { flex: 2, padding: '0.75rem', background: '#4f46e5', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1rem', cursor: 'pointer' },
   btnSecondary: { flex: 1, padding: '0.75rem', background: '#6b7280', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1rem', cursor: 'pointer' },
-  btnSuccess: { flex: 1, padding: '0.75rem', background: '#10b981', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1rem', cursor: 'pointer' },
+  btnSuccess: { flex: 2, padding: '0.75rem', background: '#10b981', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1rem', cursor: 'pointer' },
+  // NEW: STYLE FOR EXIT BUTTON
+  btnExit: { 
+    padding: '0.75rem 1.25rem', 
+    background: '#fee2e2', 
+    color: '#dc2626', 
+    border: '1px solid #fecaca', 
+    borderRadius: '8px', 
+    fontSize: '0.9rem', 
+    cursor: 'pointer', 
+    fontWeight: '600',
+    transition: 'all 0.2s'
+  },
   rules: { textAlign: 'center', fontSize: '0.75rem', color: '#9ca3af', padding: '0.5rem', background: '#f9fafb', borderRadius: '8px' }
 };

@@ -1,4 +1,22 @@
-backend/target/target/*.class
+# Maven build folder
+target/
 
+# Node modules (if frontend in same repo)
+node_modules/
 
+# Logs
+*.log
+
+# OS files
+.DS_Store
+
+# IDE files
+.idea/
+*.iml
+
+# Environment files (optional)
+.env
+
+# Application config (only if you don't want to expose secrets)
 backend/src/main/resources/application.yml
+

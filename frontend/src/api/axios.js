@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://ai-interview-platform-8ptv.onrender.com',
+  // baseURL: 'https://ai-interview-platform-8ptv.onrender.com'
+  baseURL: 'http://localhost:8081'
 });
 
 api.interceptors.request.use((config) => {

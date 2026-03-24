@@ -1,92 +1,56 @@
-package com.example.backend.controller;
+package com.example.backend.controllers;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.http.HttpStatus;
 import com.example.backend.entities.User;
 import com.example.backend.repositories.UserRepository;
 import com.example.backend.security.JwtUtil;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.HashMap;
 
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
-    private final JwtUtil jwtUtil;
-    private final PasswordEncoder passwordEncoder; // ✅ final
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    public AuthController(AuthenticationManager authenticationManager,
-                      UserDetailsService userDetailsService,
-                      JwtUtil jwtUtil,
-                      PasswordEncoder passwordEncoder,
-                      UserRepository userRepository) {
+    @Autowired
+    private JwtUtil jwtUtil;
 
-    this.authenticationManager = authenticationManager;
-    this.userDetailsService = userDetailsService;
-    this.jwtUtil = jwtUtil;
-    this.passwordEncoder = passwordEncoder;
-    this.userRepository = userRepository;
-}
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
-public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
+    public ResponseEntity<?> register(@Valid @RequestBody User user) {
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            return ResponseEntity
+                .status(HttpStatus.CONFLICT) // ✅ 409
+                .body("User already exists");
+        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+        return ResponseEntity.ok("User registered successfully");
+    }
 
-    String username = request.get("username");
-    String password = request.get("password");
-
-    // Create user entity
-    User user = new User();
-    user.setUsername(username);
-
-    // 🔥 IMPORTANT LINE (ADD HERE)
-    user.setPassword(passwordEncoder.encode(password));
-
-    userRepository.save(user);
-
-    return ResponseEntity.ok("User registered successfully");
-}
-
-    // ✅ LOGIN (already correct)
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> loginRequest) {
-        Map<String, Object> response = new HashMap<>();
-        String username = loginRequest.get("username");
-        String password = loginRequest.get("password");
+    public ResponseEntity<?> login(@RequestBody User user) {
+        User found = userRepository.findByUsername(user.getUsername())
+                .orElse(null);
 
-        if (username == null || password == null) {
-            response.put("error", "Username and password must be provided");
-            return ResponseEntity.badRequest().body(response);
+        if (found == null) {
+            return ResponseEntity.status(401).body("Invalid credentials");
         }
 
-        try {
-            authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password)
-            );
-
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            String token = jwtUtil.generateToken(userDetails.getUsername());
-
-            response.put("username", username);
-            response.put("token", token);
-
-            return ResponseEntity.ok(response);
-
-        } catch (AuthenticationException e) {
-            response.put("error", "Invalid username or password");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        if (!passwordEncoder.matches(user.getPassword(), found.getPassword())) {
+            return ResponseEntity.status(401).body("Invalid credentials");
         }
+
+        String token = jwtUtil.generateToken(found.getUsername());
+        return ResponseEntity.ok(Map.of("token", token));
     }
 }
