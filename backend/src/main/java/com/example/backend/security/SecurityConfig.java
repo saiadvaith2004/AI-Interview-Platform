@@ -25,22 +25,32 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            // 1. MUST BE FIRST: Use the CORS configuration defined in the bean below
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // Allow all Preflight
-                .requestMatchers("/health").permitAll()
-                .requestMatchers("/auth/**").permitAll()
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        // 1. Disable CSRF (essential for stateless APIs)
+        .csrf(csrf -> csrf.disable())
+        
+        // 2. Apply CORS first
+        .cors(Customizer.withDefaults()) 
+        
+        // 3. Set session to stateless
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        
+        // 4. Authorization Rules
+        .authorizeHttpRequests(auth -> auth
+            // Explicitly allow OPTIONS for all paths (Preflight)
+            .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers("/health").permitAll()
+            // USE BOTH JUST IN CASE (or match your Controller exactly)
+            .requestMatchers("/auth/**", "/api/auth/**").permitAll() 
+            .anyRequest().authenticated()
+        )
+        
+        // 5. JWT Filter
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+    return http.build();
+}
 
     // Using Full Paths here to avoid "cannot find symbol" compiler errors
     @Bean
