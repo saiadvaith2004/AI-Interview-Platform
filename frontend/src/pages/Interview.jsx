@@ -11,6 +11,7 @@ export default function Interview() {
 
   const questions = JSON.parse(interview?.questionsJson || '[]');
   const [current, setCurrent] = useState(0);
+  const [isExiting, setIsExiting] = useState(false);
   const [answers, setAnswers] = useState(Array(questions.length).fill(''));
   const [submitting, setSubmitting] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_PER_QUESTION);
@@ -79,7 +80,7 @@ export default function Interview() {
   // Detect fullscreen exit — show modal blocking screen
   useEffect(() => {
     const handleFullscreenChange = () => {
-      if (!document.fullscreenElement) {
+      if (!document.fullscreenElement && !isExiting && !submitting) {
         showWarningAlert('⚠️ Exiting fullscreen is not allowed during the interview!');
         setShowFullscreenModal(true);
       }
@@ -92,7 +93,7 @@ export default function Interview() {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
     };
-  }, [showWarningAlert]);
+  }, [showWarningAlert, isExiting, submitting]);
 
   // Disable copy-paste and detect violations
   useEffect(() => {
@@ -206,6 +207,7 @@ export default function Interview() {
     );
     
     if (confirmExit) {
+      setIsExiting(true);
       clearTimeout(timerRef.current);
       // Ensure we leave fullscreen before navigating back
       if (document.exitFullscreen && document.fullscreenElement) {
@@ -217,6 +219,7 @@ export default function Interview() {
 
   const handleSubmit = async () => {
     clearTimeout(timerRef.current);
+    setIsExiting(true);
     if (document.exitFullscreen && document.fullscreenElement) {
       document.exitFullscreen();
     }
