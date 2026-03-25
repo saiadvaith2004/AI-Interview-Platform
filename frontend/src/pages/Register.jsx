@@ -24,19 +24,27 @@ export default function Register() {
       return;
     }
 
-    // 3. Clear previous errors and proceed to API call
     setError(''); 
     try {
       await api.post('/auth/register', { username, password });
+      
+      // Success feedback
       setMessage('Registered successfully! Redirecting to login...');
       setError('');
+      
+      // Use navigate immediately if the timeout feels slow, or keep it for the UX
       setTimeout(() => navigate('/login'), 1500);
+      
     } catch (err) {
-      if (err.response?.status === 400) {
-        setError('Username already exists or invalid data. Try a different one.');
+      // 3. Handle specific HTTP Status Codes
+      if (err.response?.status === 409) {
+        setError('This username is already taken. Try another one.');
+      } else if (err.response?.status === 400) {
+        setError('Invalid registration data. Please check your inputs.');
       } else {
-        setError('Registration failed. Is the backend running?');
+        setError('Server error or connection failed. Is the backend running?');
       }
+      setMessage(''); // Clear success message if an error occurs
     }
   };
 

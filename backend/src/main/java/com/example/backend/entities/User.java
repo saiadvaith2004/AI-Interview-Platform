@@ -11,10 +11,15 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true, nullable = false)
     private String username;
+
     @Size(min = 7, message = "Password must be at least 7 characters long")
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[!@#$%^&*]).*$", 
              message = "Password must contain at least one number and one special character")
+
+    @Column(nullable = false)         
     private String password;
 
     @Column(columnDefinition = "LONGBLOB")

@@ -24,13 +24,19 @@ public class JwtFilter extends OncePerRequestFilter {
     private UserDetailsService userDetailsService;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+        return path.startsWith("/auth/") || path.startsWith("/api/auth/");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
+                
         String path = request.getServletPath();
-        
-        // 1. BYPASS for public endpoints
-        if (path.equals("/health") || path.startsWith("/auth/")) {
+        String method = request.getMethod();
+
+        if ("OPTIONS".equalsIgnoreCase(method) || path.startsWith("/auth/") || path.startsWith("/api/auth/")) {
             filterChain.doFilter(request, response);
             return;
         }
