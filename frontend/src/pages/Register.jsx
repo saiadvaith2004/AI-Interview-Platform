@@ -2,6 +2,11 @@ import { useState } from 'react';
 import api from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 
+window.onerror = function(msg, url, linenumber) {
+    alert('JavaScript Error: ' + msg + '\nURL: ' + url + '\nLine: ' + linenumber);
+    return true;
+};
+
 export default function Register() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
