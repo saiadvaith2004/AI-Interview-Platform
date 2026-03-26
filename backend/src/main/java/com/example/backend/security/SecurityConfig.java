@@ -34,26 +34,26 @@ public class SecurityConfig {
     }
 
    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            // 1. CRITICAL: Enable CORS and point it to a source
-            .cors(Customizer.withDefaults())
-            
-            // 2. Disable CSRF (required for stateless REST APIs)
-            .csrf(csrf -> csrf.disable())
-            
-            // 3. Set up the "Who can enter" rules
-            .authorizeHttpRequests(auth -> auth
-                // Allow the browser to send 'OPTIONS' (Pre-flight) checks
-                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-                // Allow anyone to Register or Login
-                .requestMatchers("/auth/**").permitAll() 
-                // Everything else requires a Token
-                .anyRequest().authenticated()
-            );
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .cors(Customizer.withDefaults())
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(auth -> auth
+            // Allow pre-flight and auth paths
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers("/auth/**").permitAll() 
+            // Lock everything else
+            .anyRequest().authenticated()
+        )
+        // CRITICAL: Set to Stateless for JWT
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        )
+        // CRITICAL: This is what connects your JwtFilter to the logic!
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+    return http.build();
+}
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
