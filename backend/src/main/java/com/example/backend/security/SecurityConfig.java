@@ -14,7 +14,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
-import java.beans.Customizer;
+import org.springframework.security.config.Customizer;
 import java.util.Arrays;
 import java.util.List;
 
