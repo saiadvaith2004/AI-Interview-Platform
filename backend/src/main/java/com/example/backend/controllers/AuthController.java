@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
+@CrossOrigin(origins = "https://ai-interview-platform-ten-gray.vercel.app")
 @RequestMapping("/auth")
 public class AuthController {
 
