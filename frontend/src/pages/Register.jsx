@@ -37,6 +37,8 @@ export default function Register() {
       
     } catch (err) {
       // 3. Handle specific HTTP Status Codes
+      alert("Error Code: " + err.response?.status || "Network Timeout");
+
       if (err.response?.status === 409) {
         setError('This username is already taken. Try another one.');
       } else if (err.response?.status === 400) {
