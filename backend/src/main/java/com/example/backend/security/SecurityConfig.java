@@ -13,6 +13,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.beans.Customizer;
 import java.util.List;
 
 @Configuration
@@ -32,25 +33,22 @@ public class SecurityConfig {
    @Bean
 public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
-        // 1. Position CORS at the start of the chain
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        
-        // 2. Disable CSRF for Stateless JWT APIs
+        // 1. Tell Spring Security to look at your WebConfig.java
+        .cors(cors -> cors.configurationSource(request -> {
+            var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
+            corsConfiguration.setAllowedOrigins(java.util.List.of("https://your-frontend.vercel.app", "http://localhost:5173"));
+            corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+            corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
+            corsConfiguration.setAllowCredentials(true);
+            return corsConfiguration;
+        }))
+        // 2. Disable CSRF (usually required for stateless REST APIs)
         .csrf(csrf -> csrf.disable())
-        
-        // 3. Set Session to Stateless (Crucial for JWT)
-        .sessionManagement(session -> 
-            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        
-        // 4. Map Permissions
+        // 3. Permit all requests to your auth endpoints
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers("/auth/**").permitAll() 
             .anyRequest().authenticated()
-        )
-        
-        // 5. Add JWT Filter BEFORE the standard Auth filter
-        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        );
 
     return http.build();
 }
