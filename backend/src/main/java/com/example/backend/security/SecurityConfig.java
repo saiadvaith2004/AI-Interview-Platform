@@ -37,7 +37,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             // 1. CRITICAL: Enable CORS and point it to a source
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .cors(Customizer.withDefaults())
             
             // 2. Disable CSRF (required for stateless REST APIs)
             .csrf(csrf -> csrf.disable())
@@ -50,9 +50,7 @@ public class SecurityConfig {
                 .requestMatchers("/auth/**").permitAll() 
                 // Everything else requires a Token
                 .anyRequest().authenticated()
-            )
-            // 4. Ensure we don't try to use Sessions (since we use JWT)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            );
 
         return http.build();
     }
