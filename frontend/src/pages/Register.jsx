@@ -10,45 +10,40 @@ export default function Register() {
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
-    // 1. Basic empty field check
-    if (!username || !password) {
-      setError('Please fill in all fields');
-      return;
-    }
+  alert("1. Button Clicked!"); // <-- First Marker
 
-    // 2. STRENGTH VALIDATION: 7+ chars, 1 Upper, 1 Number, 1 Special
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/;
+  if (!username || !password) {
+    setError('Please fill in all fields');
+    return;
+  }
+
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/;
+  if (!passwordRegex.test(password)) {
+    alert("2. Password Regex Failed!"); // <-- Check if Regex is crashing it
+    setError("Password too weak.");
+    return;
+  }
+
+  alert("3. Validation Passed. Calling API..."); // <-- If you see this, Regex is fine
+
+  try {
+    // This uses your updated api/axios.js
+    const response = await api.post('/auth/register', { username, password });
+    alert("4. API SUCCESS!"); 
+    setMessage('Registered successfully!');
+    setTimeout(() => navigate('/login'), 1500);
     
-    if (!passwordRegex.test(password)) {
-      setError("Password must be at least 7 characters, include one uppercase letter, one number, and one special character (@$!%*?&).");
-      return;
+  } catch (err) {
+    // If it reaches here, we know the backend rejected it
+    alert("5. API ERROR: " + JSON.stringify(err.response?.status || err.message));
+    
+    if (err.response?.status === 409) {
+      setError('Username taken.');
+    } else {
+      setError('Connection failed.');
     }
-
-    setError(''); 
-    try {
-      await api.post('/auth/register', { username, password });
-      
-      // Success feedback
-      setMessage('Registered successfully! Redirecting to login...');
-      setError('');
-      
-      // Use navigate immediately if the timeout feels slow, or keep it for the UX
-      setTimeout(() => navigate('/login'), 1500);
-      
-    } catch (err) {
-      // 3. Handle specific HTTP Status Codes
-      alert("Error Code: " + err.response?.status || "Network Timeout");
-
-      if (err.response?.status === 409) {
-        setError('This username is already taken. Try another one.');
-      } else if (err.response?.status === 400) {
-        setError('Invalid registration data. Please check your inputs.');
-      } else {
-        setError('Server error or connection failed. Is the backend running?');
-      }
-      setMessage(''); // Clear success message if an error occurs
-    }
-  };
+  }
+};
 
   return (
     <div style={styles.container}>
