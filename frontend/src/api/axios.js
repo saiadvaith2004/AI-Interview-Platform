@@ -10,7 +10,7 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   // Check if url exists before calling .includes to prevent crashes
-  const isAuthEndpoint = config.url?.includes('/auth/');
+  const isAuthEndpoint = config.url && config.url.includes('/auth/');
   
   if (token && !isAuthEndpoint) {
     config.headers.Authorization = `Bearer ${token}`;
