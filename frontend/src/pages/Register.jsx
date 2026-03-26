@@ -73,9 +73,15 @@ export default function Register() {
           Min. 7 chars (A-Z, 0-9, @$!%*?&)
         </p>
 
-        <button style={styles.button} onClick={handleSubmit}>
-          Register
-        </button>
+        <button 
+  style={{ ...styles.button, zIndex: 9999, position: 'relative' }} 
+  onClick={() => {
+    alert("Button logic triggered!");
+    handleSubmit();
+  }}
+>
+  Register Now
+</button>
 
         {message && <p style={styles.success}>{message}</p>}
         {error && <p style={styles.error}>{error}</p>}
