@@ -14,7 +14,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    @Value("${app.jwt.secret}")
+    @Value("${app.jwt.secret:advaith_ai_interview_platform_secure_key_2026_top_secret_fallback_string}")
     private String secretString;
 
     private Key key;
