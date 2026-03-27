@@ -1,8 +1,5 @@
 package com.example.backend.security;
 
-import org.springframework.web.filter.CorsFilter;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.core.Ordered;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -45,73 +42,43 @@ public class SecurityConfig {
     @Bean
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-        // 1. MUST BE FIRST: Process CORS before any security checks
         .cors(Customizer.withDefaults()) 
-        
-        // 2. Disable CSRF for your JWT-based API
         .csrf(csrf -> csrf.disable())
-        
-        // 3. Set session to Stateless (standard for JWT)
-        .sessionManagement(session -> session
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        )
-        
-        // 4. Update the Request Matchers
         .authorizeHttpRequests(auth -> auth
-            // Permit the root and health check
-            .requestMatchers("/", "/health").permitAll()
-            
-            // Permit ALL Auth endpoints (Login, Register)
-            .requestMatchers("/auth/**").permitAll() 
-            
-            // CRITICAL: Permit OPTIONS (Preflight) requests for the entire app
+            // Use permitAll() for the exact paths
+            .requestMatchers("/auth/login", "/auth/register", "/health").permitAll()
+            // Also permit the general pattern
+            .requestMatchers("/auth/**").permitAll()
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-            
-            // Everything else requires a valid JWT
             .anyRequest().authenticated()
         )
-        
-        // 5. Add your JWT Filter
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
 }
 
     @Bean
-public FilterRegistrationBean<CorsFilter> corsFilterRegistrationBean() {
-    CorsConfiguration config = new CorsConfiguration();
-    config.setAllowCredentials(true);
-    config.setAllowedOrigins(Arrays.asList(
-        "http://localhost:5173", 
-        "https://ai-interview-platform-ten-gray.vercel.app"
-    ));
-    config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
-    config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", config);
-    
-    FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
-    // This line is the magic - it puts CORS at the VERY TOP of the entire app
-    bean.setOrder(Ordered.HIGHEST_PRECEDENCE); 
-    return bean;
-}
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        
+        config.setAllowedOrigins(Arrays.asList(
+            "http://localhost:5173", 
+            "https://ai-interview-platform-ten-gray.vercel.app"
+        )); 
+        
+        // Include common methods including OPTIONS and PATCH
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        
+        // Standard headers
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
+        
+        // Crucial for JWTs if they are ever sent back in a custom header
+        config.setExposedHeaders(Arrays.asList("Authorization"));
+        config.setAllowCredentials(true);
 
-    @Bean
-public CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration config = new CorsConfiguration();
-    
-    config.setAllowedOrigins(Arrays.asList(
-        "http://localhost:5173", 
-        "https://ai-interview-platform-ten-gray.vercel.app" // MUST match your Vercel URL
-    )); 
-    
-    config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Origin"));
-    config.setAllowCredentials(true); // MUST be true if frontend uses withCredentials: true
-
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", config);
-    return source;
-}
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
 }

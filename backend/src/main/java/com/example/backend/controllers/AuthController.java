@@ -15,7 +15,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "https://ai-interview-platform-ten-gray.vercel.app")
 public class AuthController {
 
     @Autowired
