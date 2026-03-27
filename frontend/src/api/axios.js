@@ -1,20 +1,13 @@
 import axios from 'axios';
 
 const api = axios.create({
-  // REPLACE with your actual Render URL
-  baseURL: 'https://ai-powered-interview-platform.onrender.com', 
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
-
-// This automatically attaches your JWT token to every request
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+    // IMPORTANT: No trailing slash at the end of the URL
+    baseURL: 'https://ai-interview-platform-ten-gray.onrender.com', 
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    // Required if you handle sessions/cookies, otherwise optional but safe
+    withCredentials: true 
 });
 
 export default api;

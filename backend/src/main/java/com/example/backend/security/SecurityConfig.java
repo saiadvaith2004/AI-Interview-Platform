@@ -59,29 +59,20 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        
-        // ADDED YOUR ACTUAL VERCEL URL HERE
-        config.setAllowedOrigins(Arrays.asList(
-            "http://localhost:5173", 
-            "https://ai-interview-platform-ten-gray.vercel.app" 
-        )); 
-        
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        
-        config.setAllowedHeaders(Arrays.asList(
-            "Authorization", 
-            "Content-Type", 
-            "Accept", 
-            "Origin", 
-            "X-Requested-With"
-        ));
-        
-        config.setAllowCredentials(true);
+public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration config = new CorsConfiguration();
+    
+    config.setAllowedOrigins(Arrays.asList(
+        "http://localhost:5173", 
+        "https://ai-interview-platform-ten-gray.vercel.app" // MUST match your Vercel URL
+    )); 
+    
+    config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Origin"));
+    config.setAllowCredentials(true); // MUST be true if frontend uses withCredentials: true
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
-    }
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    return source;
+}
 }
