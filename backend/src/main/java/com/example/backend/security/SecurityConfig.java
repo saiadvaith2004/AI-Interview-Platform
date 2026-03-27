@@ -62,11 +62,11 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
 public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(Arrays.asList(
-        "http://localhost:5173", // For local development
-        "https://your-frontend-link.vercel.app" // Add your live frontend URL here
+        "http://localhost:5173", // Allow your local React dev server
+        "https://ai-interview-platform-8ptv.onrender.com" // Allow your future production frontend
     ));
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
     configuration.setAllowCredentials(true);
     
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
