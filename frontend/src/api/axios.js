@@ -2,9 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   // Automatically switches between Local and Render based on the URL in your browser
-  baseURL: window.location.hostname === 'localhost' 
-    ? 'http://localhost:8081' 
-    : 'https://ai-interview-platform-8ptv.onrender.com'
+  baseURL: 'https://ai-interview-platform-8ptv.onrender.com'
 });
 
 api.interceptors.request.use((config) => {
