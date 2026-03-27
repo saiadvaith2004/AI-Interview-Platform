@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
     // IMPORTANT: No trailing slash at the end of the URL
-    baseURL: 'https://ai-interview-platform-ten-gray.onrender.com', 
+    baseURL: 'https://ai-interview-platform-8ptv.onrender.com', 
     headers: {
         'Content-Type': 'application/json'
     },
