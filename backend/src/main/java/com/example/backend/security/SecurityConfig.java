@@ -58,17 +58,15 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
     return http.build();
 }
 
-    @Bean
+   @Bean
 public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    // Use List.of for a cleaner, modern Java approach
-    configuration.setAllowedOrigins(List.of(
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "https://your-frontend-name.vercel.app" // Add your actual frontend URL here
+    configuration.setAllowedOrigins(Arrays.asList(
+        "http://localhost:5173", // For local development
+        "https://your-frontend-link.vercel.app" // Add your live frontend URL here
     ));
-    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
     configuration.setAllowCredentials(true);
     
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
