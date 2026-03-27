@@ -6,8 +6,19 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json'
     },
-    // Required if you handle sessions/cookies, otherwise optional but safe
     withCredentials: true 
 });
+
+// Automatically inject JWT Token stored during login into every API Request
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
 
 export default api;

@@ -34,9 +34,16 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.CREATED)
                                  .body(Map.of("message", "User registered successfully"));
         } catch (Exception e) {
-            // If the username is taken, the Service throws an error caught here
+            // Get the root cause of the error for explicit debugging
+            String rootCause = e.getMessage();
+            if (e.getCause() != null) {
+                rootCause = e.getCause().toString();
+                if (e.getCause().getCause() != null) {
+                    rootCause = e.getCause().getCause().toString();
+                }
+            }
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                                 .body(Map.of("message", e.getMessage()));
+                                 .body(Map.of("message", "DB Error: " + rootCause));
         }
     }
 
