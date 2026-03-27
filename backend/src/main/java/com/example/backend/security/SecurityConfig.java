@@ -40,23 +40,39 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .cors(Customizer.withDefaults()) // Simplified CORS linking
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/health").permitAll() 
-                .requestMatchers("/auth/**").permitAll() 
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Preflight
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        // 1. MUST BE FIRST: Process CORS before any security checks
+        .cors(Customizer.withDefaults()) 
+        
+        // 2. Disable CSRF for your JWT-based API
+        .csrf(csrf -> csrf.disable())
+        
+        // 3. Set session to Stateless (standard for JWT)
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        )
+        
+        // 4. Update the Request Matchers
+        .authorizeHttpRequests(auth -> auth
+            // Permit the root and health check
+            .requestMatchers("/", "/health").permitAll()
+            
+            // Permit ALL Auth endpoints (Login, Register)
+            .requestMatchers("/auth/**").permitAll() 
+            
+            // CRITICAL: Permit OPTIONS (Preflight) requests for the entire app
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            
+            // Everything else requires a valid JWT
+            .anyRequest().authenticated()
+        )
+        
+        // 5. Add your JWT Filter
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+    return http.build();
+}
 
     @Bean
 public CorsConfigurationSource corsConfigurationSource() {
