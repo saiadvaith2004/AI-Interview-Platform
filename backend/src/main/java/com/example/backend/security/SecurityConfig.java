@@ -48,10 +48,11 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         )
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/", "/health").permitAll() // Allow the root URL
-            .requestMatchers("/auth/**").permitAll()    // Allow login/register
-            .anyRequest().authenticated()               // Lock everything else
-        )
+    .requestMatchers("/", "/health").permitAll() // ADD THIS LINE
+    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+    .requestMatchers("/auth/**").permitAll() 
+    .anyRequest().authenticated()
+)
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
