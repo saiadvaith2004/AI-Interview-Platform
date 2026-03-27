@@ -2,58 +2,65 @@ import { useState } from 'react';
 import api from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 
-window.onerror = function(msg, url, linenumber) {
-    alert('JavaScript Error: ' + msg + '\nURL: ' + url + '\nLine: ' + linenumber);
-    return true;
-};
-
 export default function Register() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState(''); // New State
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
-  alert("1. Button Clicked!"); // <-- First Marker
+    setError('');
+    setMessage('');
 
-  if (!username || !password) {
-    setError('Please fill in all fields');
-    return;
-  }
-
-  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/;
-  if (!passwordRegex.test(password)) {
-    alert("2. Password Regex Failed!"); // <-- Check if Regex is crashing it
-    setError("Password too weak.");
-    return;
-  }
-
-  alert("3. Validation Passed. Calling API..."); // <-- If you see this, Regex is fine
-
-  try {
-    // This uses your updated api/axios.js
-    const response = await api.post('/auth/register', { username, password });
-    alert("4. API SUCCESS!"); 
-    setMessage('Registered successfully!');
-    setTimeout(() => navigate('/login'), 1500);
-    
-  } catch (err) {
-    // If it reaches here, we know the backend rejected it
-    alert("5. API ERROR: " + JSON.stringify(err.response?.status || err.message));
-    
-    if (err.response?.status === 409) {
-      setError('Username taken.');
-    } else {
-      setError('Connection failed.');
+    // 1. Basic Null Check
+    if (!username || !password || !confirmPassword) {
+      setError('Please fill in all fields');
+      return;
     }
-  }
-};
+
+    // 2. Password Match Check (Local check)
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    // 3. Complexity Check (Regex)
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/;
+    if (!passwordRegex.test(password)) {
+      setError("Password too weak (Need A-Z, 0-9, @$!%*?&)");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await api.post('/auth/register', { username, password });
+      setMessage('Registered successfully!');
+      setTimeout(() => navigate('/login'), 1500);
+    } catch (err) {
+      if (err.response && err.response.status === 409) {
+          setError(err.response.data); // "Username already taken" from Java
+      } else {
+          setError('Connection failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
         <h2 style={{ textAlign: 'center', marginBottom: '0.5rem' }}>Create Account</h2>
+        
+        {error && (
+          <div style={styles.errorBox}>
+            {error}
+          </div>
+        )}
+
         <input
           style={styles.input}
           placeholder="Username"
@@ -67,24 +74,28 @@ export default function Register() {
           value={password}
           onChange={e => setPassword(e.target.value)}
         />
+        {/* NEW INPUT FIELD */}
+        <input
+          style={styles.input}
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={e => setConfirmPassword(e.target.value)}
+        />
         
-        {/* Short hint for the user */}
         <p style={{ fontSize: '0.7rem', color: '#666', margin: '0' }}>
           Min. 7 chars (A-Z, 0-9, @$!%*?&)
         </p>
 
         <button 
-  style={{ ...styles.button, zIndex: 9999, position: 'relative' }} 
-  onClick={() => {
-    alert("Button logic triggered!");
-    handleSubmit();
-  }}
->
-  Register Now
-</button>
+          style={{...styles.button, opacity: loading ? 0.7 : 1}} 
+          onClick={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? "Registering..." : "Register Now"}
+        </button>
 
         {message && <p style={styles.success}>{message}</p>}
-        {error && <p style={styles.error}>{error}</p>}
         
         <p style={{ textAlign: 'center', fontSize: '0.9rem' }}>
           Already have an account? <a href="/login" style={{ color: '#4f46e5' }}>Login</a>
@@ -100,5 +111,5 @@ const styles = {
   input: { padding: '0.75rem', borderRadius: '4px', border: '1px solid #ddd', fontSize: '1rem' },
   button: { padding: '0.75rem', background: '#4f46e5', color: 'white', border: 'none', borderRadius: '4px', fontSize: '1rem', cursor: 'pointer' },
   success: { color: 'green', textAlign: 'center', fontSize: '0.85rem' },
-  error: { color: 'red', textAlign: 'center', fontSize: '0.85rem', lineHeight: '1.2' }
+  errorBox: { color: '#721c24', backgroundColor: '#f8d7da', padding: '8px', borderRadius: '4px', fontSize: '0.85rem', border: '1px solid #f5c6cb', textAlign: 'center' }
 };

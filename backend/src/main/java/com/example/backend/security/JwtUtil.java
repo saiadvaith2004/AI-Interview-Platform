@@ -14,8 +14,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // Reads from Render Environment Variables (or application.properties)
-    @Value("${JWT_SECRET}")
+    @Value("${app.jwt.secret}")
     private String secretString;
 
     private Key key;
@@ -23,11 +22,9 @@ public class JwtUtil {
 
     @PostConstruct
     public void init() {
-        // Initializes the key once the dependency injection is complete
         this.key = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
     }
 
-    // Generate JWT token
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
@@ -37,7 +34,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    // Extract username from token
     public String extractUsername(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -47,18 +43,15 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    // Validate token against user details
     public Boolean validateToken(String token, UserDetails userDetails) {
         try {
             String username = extractUsername(token);
             return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
         } catch (JwtException | IllegalArgumentException e) {
-            // Token is invalid or tampered with
             return false;
         }
     }
 
-    // Check if token is expired
     private boolean isTokenExpired(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)

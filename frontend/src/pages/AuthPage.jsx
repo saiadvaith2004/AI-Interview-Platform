@@ -9,6 +9,7 @@ export default function AuthPage() {
   const [regForm, setRegForm] = useState({ username: '', password: '', confirm: '' });
   const [loginError, setLoginError] = useState('');
   const [regError, setRegError] = useState('');
+  
   const [validations, setValidations] = useState({
     hasUpper: false, 
     hasNumber: false, 
@@ -18,7 +19,7 @@ export default function AuthPage() {
   
   const navigate = useNavigate();
 
-  // FIXED: Dependency set to regForm.password
+  // Password validation logic
   useEffect(() => {
     const password = regForm.password || "";
     setValidations({
@@ -32,42 +33,66 @@ export default function AuthPage() {
   const switchMode = (target) => {
     if (animating || mode === target) return;
     setAnimating(true);
+    setLoginError('');
+    setRegError('');
     setTimeout(() => {
       setMode(target);
       setAnimating(false);
     }, 480);
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoginError('');
     try {
-      const res = await api.post('/auth/login', loginForm);
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('username', loginForm.username);
-      navigate('/dashboard');
-    } catch {
-      setLoginError('Invalid username or password');
+        // Use loginForm.username/password instead of the undefined variables
+        const response = await api.post('/auth/login', {
+            username: loginForm.username, 
+            password: loginForm.password
+        });
+
+        // Store details and navigate
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('username', loginForm.username);
+        
+        alert("Login Successful!");
+        navigate('/dashboard');
+    } catch (err) {
+        console.error("Login Error:", err);
+        setLoginError(err.response?.data || "Invalid username or password");
     }
   };
 
-  const handleRegister = async () => {
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setRegError('');
+    
     if (regForm.password !== regForm.confirm) {
       setRegError('Passwords do not match');
       return;
     }
+
     try {
-      const dataToSend = { username: regForm.username, password: regForm.password };
-      await api.post('/auth/register', regForm);
+      // Send the correct object structure
+      await api.post('/auth/register', { 
+        username: regForm.username, 
+        password: regForm.password 
+      });
+      
+      alert("Registration Successful! Please login.");
+      setLoginForm({ username: regForm.username, password: '' }); // Pre-fill login
       switchMode('login');
-    } catch {
-      const msg = err.response?.data?.message || 'Registration failed. Try again.';
-      setRegError(msg);
-      console.error('Registration error:', err.response?.data);
+    } catch (err) {
+      console.error('Registration failed: ', err);
+      if (err.response?.status === 409) {
+          setRegError("Username already exists");
+      } else {
+          setRegError("Registration failed. Please try again.");
+      }
     }
   };
 
   const isLogin = mode === 'login';
-  
-  // Helper for button state
   const isRegDisabled = !validations.hasUpper || !validations.hasNumber || !validations.hasSpecial || !validations.hasLength;
 
   return (
@@ -133,9 +158,11 @@ export default function AuthPage() {
               <div className="form-sub">Sign in to continue</div>
             </div>
             <div className="divider" />
-            <input className="auth-input" placeholder="Username" value={loginForm.username} onChange={e => setLoginForm({ ...loginForm, username: e.target.value })} />
-            <input className="auth-input" type="password" placeholder="Password" value={loginForm.password} onChange={e => setLoginForm({ ...loginForm, password: e.target.value })} />
-            <button className="auth-btn" onClick={handleLogin}>Login</button>
+            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+                <input className="auth-input" placeholder="Username" value={loginForm.username} onChange={e => setLoginForm({ ...loginForm, username: e.target.value })} />
+                <input className="auth-input" type="password" placeholder="Password" value={loginForm.password} onChange={e => setLoginForm({ ...loginForm, password: e.target.value })} />
+                <button type="submit" className="auth-btn">Login</button>
+            </form>
             {loginError && <p className="auth-error">{loginError}</p>}
             <p className="auth-footer">No account? <button onClick={() => switchMode('register')}>Register here</button></p>
           </div>
@@ -147,40 +174,42 @@ export default function AuthPage() {
               <div className="form-sub">Join us today</div>
             </div>
             <div className="divider" />
-            <input className="auth-input" placeholder="Username" value={regForm.username} onChange={e => setRegForm({ ...regForm, username: e.target.value })} />
-            
-            <input 
-              className="auth-input" 
-              type="password" 
-              placeholder="Password" 
-              value={regForm.password} 
-              onChange={e => setRegForm({ ...regForm, password: e.target.value })} 
-            />
+            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+                <input className="auth-input" placeholder="Username" value={regForm.username} onChange={e => setRegForm({ ...regForm, username: e.target.value })} />
+                
+                <input 
+                  className="auth-input" 
+                  type="password" 
+                  placeholder="Password" 
+                  value={regForm.password} 
+                  onChange={e => setRegForm({ ...regForm, password: e.target.value })} 
+                />
 
-            <input 
-              className="auth-input" 
-              type="password" 
-              placeholder="Confirm password" 
-              value={regForm.confirm} 
-              onChange={e => setRegForm({ ...regForm, confirm: e.target.value })} 
-            />
+                <input 
+                  className="auth-input" 
+                  type="password" 
+                  placeholder="Confirm password" 
+                  value={regForm.confirm} 
+                  onChange={e => setRegForm({ ...regForm, confirm: e.target.value })} 
+                />
 
-            {/* Validation Checklist */}
-            <div style={styles.validationContainer}>
-              <ValidationItem label="One Uppercase Letter" isValid={validations.hasUpper} />
-              <ValidationItem label="One Special Character" isValid={validations.hasSpecial} />
-              <ValidationItem label="One Number" isValid={validations.hasNumber} />
-              <ValidationItem label="At least 7 Characters" isValid={validations.hasLength} />  
-            </div>
+                {/* Validation Checklist */}
+                <div style={styles.validationContainer}>
+                  <ValidationItem label="One Uppercase Letter" isValid={validations.hasUpper} />
+                  <ValidationItem label="One Special Character" isValid={validations.hasSpecial} />
+                  <ValidationItem label="One Number" isValid={validations.hasNumber} />
+                  <ValidationItem label="At least 7 Characters" isValid={validations.hasLength} />  
+                </div>
 
-            <button 
-              className="auth-btn" 
-              onClick={handleRegister}
-              disabled={isRegDisabled}
-              style={{ opacity: isRegDisabled ? 0.5 : 1 }}
-            >
-              Register
-            </button>
+                <button 
+                  type="submit"
+                  className="auth-btn" 
+                  disabled={isRegDisabled}
+                  style={{ opacity: isRegDisabled ? 0.5 : 1 }}
+                >
+                  Register
+                </button>
+            </form>
 
             {regError && <p className="auth-error">{regError}</p>}
             <p className="auth-footer">Already have an account? <button onClick={() => switchMode('login')}>Sign in</button></p>
