@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 
 @Component
@@ -24,47 +25,49 @@ public class JwtFilter extends OncePerRequestFilter {
     private UserDetailsService userDetailsService;
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String path = request.getServletPath();
-        return path.startsWith("/auth/") || path.startsWith("/api/auth/");
-    }
-
-    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-                
-        String path = request.getServletPath();
-        String method = request.getMethod();
 
-        if ("OPTIONS".equalsIgnoreCase(method) || path.startsWith("/auth/") || path.startsWith("/api/auth/")) {
+        final String authHeader = request.getHeader("Authorization");
+        final String jwt;
+        final String username;
+
+        // 1. Check if the header exists and starts with "Bearer "
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String authHeader = request.getHeader("Authorization");
-        System.out.println("DEBUG: Auth Header is: " + authHeader);
-        String token = null;
-        String username = null;
+        // 2. Extract the actual token (skip the first 7 characters: "Bearer ")
+        jwt = authHeader.substring(7);
+        username = jwtUtil.extractUsername(jwt);
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            try {
-                username = jwtUtil.extractUsername(token);
-            } catch (Exception e) {
-                System.out.println("JWT Extraction failed: " + e.getMessage());
-            }
-        }
-
+        // 3. If we have a username and the user isn't already authenticated in this request
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (jwtUtil.validateToken(token, userDetails)) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+
+            // 4. Validate the token against the user details
+            if (jwtUtil.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                
+                // 5. Tell Spring Security: "This user is valid!"
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-
+        
+        // Continue to the next filter in the chain
         filterChain.doFilter(request, response);
+    }
+
+    // This ensures we don't filter the Auth endpoints
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+        return path.startsWith("/auth/");
     }
 }

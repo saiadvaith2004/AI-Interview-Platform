@@ -1,14 +1,14 @@
 import axios from 'axios';
 
 const api = axios.create({
-  // Use the exact URL that gave you the "UP" message
-  baseURL: 'https://ai-interview-platform-8ptv.onrender.com', 
+  // REPLACE with your actual Render URL
+  baseURL: 'https://ai-powered-interview-platform.onrender.com', 
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
-// IMPORTANT: This interceptor ensures your JWT is sent with every request
+// This automatically attaches your JWT token to every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {

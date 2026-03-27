@@ -15,11 +15,9 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
 
-    @Size(min = 7, message = "Password must be at least 7 characters long")
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[!@#$%^&*]).*$", 
-             message = "Password must contain at least one number and one special character")
-
-    @Column(nullable = false)         
+    // Note: We keep these for the initial RequestBody validation, 
+    // but the column length must be large enough for BCrypt (60+ chars).
+    @Column(nullable = false, length = 255)         
     private String password;
 
     @Column(columnDefinition = "LONGBLOB")
@@ -27,6 +25,10 @@ public class User {
 
     private String resumeFileName;
 
+    // Standard for Spring Security - Defaults to "USER"
+    private String role = "ROLE_USER";
+
+    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getUsername() { return username; }
@@ -37,4 +39,6 @@ public class User {
     public void setResume(byte[] resume) { this.resume = resume; }
     public String getResumeFileName() { return resumeFileName; }
     public void setResumeFileName(String resumeFileName) { this.resumeFileName = resumeFileName; }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 }
