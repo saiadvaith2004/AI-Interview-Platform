@@ -14,7 +14,7 @@ Role-Specific: Tailored questions for SDE-1, SDE-2, Backend Developer roles
 
 Responsive Design: Works perfectly on desktop and mobile
 
-Live Link: https://ai-interview-platform-ten-gray.vercel.app/login
+Live Link: https://ai-interview-platform-ten-gray.vercel.app
 
 🛠 Tech Stack
 Component	Technologies
