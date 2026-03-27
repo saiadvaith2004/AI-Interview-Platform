@@ -1,5 +1,8 @@
 package com.example.backend.security;
 
+import org.springframework.web.filter.CorsFilter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.core.Ordered;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -72,6 +75,26 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
+}
+
+    @Bean
+public FilterRegistrationBean<CorsFilter> corsFilterRegistrationBean() {
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowCredentials(true);
+    config.setAllowedOrigins(Arrays.asList(
+        "http://localhost:5173", 
+        "https://ai-interview-platform-ten-gray.vercel.app"
+    ));
+    config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
+    config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    
+    FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
+    // This line is the magic - it puts CORS at the VERY TOP of the entire app
+    bean.setOrder(Ordered.HIGHEST_PRECEDENCE); 
+    return bean;
 }
 
     @Bean
