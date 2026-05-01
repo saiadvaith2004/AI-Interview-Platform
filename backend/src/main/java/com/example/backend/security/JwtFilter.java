@@ -32,6 +32,13 @@ public class JwtFilter extends OncePerRequestFilter {
         final String jwt;
         final String username;
 
+        // Logging header for debugging
+        if (authHeader != null) {
+            System.out.println("DEBUG: Auth header found: " + (authHeader.startsWith("Bearer ") ? "Valid format" : "Invalid format"));
+        } else {
+            System.out.println("DEBUG: Auth header is missing for request: " + request.getRequestURI());
+        }
+
         // 1. Check if the header exists and starts with "Bearer "
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -40,7 +47,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 2. Extract the actual token (skip the first 7 characters: "Bearer ")
         jwt = authHeader.substring(7);
-        username = jwtUtil.extractUsername(jwt);
+        try {
+            username = jwtUtil.extractUsername(jwt);
+            System.out.println("DEBUG: Extracted username: " + username);
+        } catch (Exception e) {
+            System.out.println("DEBUG: Token extraction failed: " + e.getMessage());
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         // 3. If we have a username and the user isn't already authenticated in this request
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -48,6 +62,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // 4. Validate the token against the user details
             if (jwtUtil.validateToken(jwt, userDetails)) {
+                System.out.println("DEBUG: Token validated for user: " + username);
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
@@ -57,6 +72,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 
                 // 5. Tell Spring Security: "This user is valid!"
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            } else {
+                System.out.println("DEBUG: Token validation failed for user: " + username);
             }
         }
         
