@@ -40,39 +40,43 @@ public class SecurityConfig {
     }
 
     @Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .cors(Customizer.withDefaults()) 
-        .csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(auth -> auth
-            // Use permitAll() for the exact paths
-            .requestMatchers("/auth/login", "/auth/register", "/health").permitAll()
-            // Also permit the general pattern
-            .requestMatchers("/auth/**").permitAll()
-            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-            .anyRequest().authenticated()
-        )
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                // 1. Enable CORS with default settings (or custom if needed)
+                .cors(cors -> cors.configurationSource(request -> {
+                    var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
+                    corsConfiguration
+                            .setAllowedOrigins(java.util.List.of("http://localhost:5173", "http://localhost:3000"));
+                    corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
+                    return corsConfiguration;
+                }))
+                // 2. Disable CSRF (Common for REST APIs using JWT)
+                .csrf(csrf -> csrf.disable())
+                // 3. Set Permissions
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll() // Matches your registration/login path
+                        .requestMatchers("/api/test/**").permitAll() // Matches our code runner
+                        .anyRequest().authenticated());
 
-    return http.build();
-}
+        return http.build();
+    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        
+
         config.setAllowedOrigins(Arrays.asList(
-            "http://localhost:5173", 
-            "https://ai-interview-platform-ten-gray.vercel.app"
-        )); 
-        
+                "http://localhost:5173",
+                "https://ai-interview-platform-ten-gray.vercel.app"));
+
         // Include common methods including OPTIONS and PATCH
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        
+
         // Standard headers
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
-        
+        config.setAllowedHeaders(
+                Arrays.asList("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
+
         // Crucial for JWTs if they are ever sent back in a custom header
         config.setExposedHeaders(Arrays.asList("Authorization"));
         config.setAllowCredentials(true);
