@@ -1,7 +1,7 @@
                                          AI Interview Platform
 AI Interview Platform is a comprehensive Java full-stack web application designed specifically for software engineering aspirants preparing for technical interviews at top IT companies like Infosys, TCS, and Cognizant. Built with Spring Boot, React, and MySQL, it provides AI-powered mock interviews with personalized Java, DSA, SQL questions, real-time feedback, and performance analytics to help you ace your coding interviews.
 
-✨ Features
+Features
 AI-Powered Questions: Context-aware interview questions on Java, Data Structures, Algorithms, SQL, and System Design
 
 Mock Interview Mode: Timed sessions simulating real interview pressure
@@ -14,7 +14,7 @@ Role-Specific: Tailored questions for SDE-1, SDE-2, Backend Developer roles
 
 Responsive Design: Works perfectly on desktop and mobile
 
-🛠 Tech Stack
+Tech Stack
 Component	Technologies
 Frontend	React.js, Tailwind CSS, Axios
 Backend	Spring Boot, Hibernate/JPA, Spring Security
@@ -23,7 +23,8 @@ AI/ML	Google Gemini API / Ollama
 Build Tools	Maven, Vite/NPM
 Authentication	JWT Tokens
 Deployment	Docker (optional)
-🚀 Quick Start
+
+Quick Start
 Clone the repository
 
 bash
@@ -54,8 +55,8 @@ Access the platform
 Backend API: http://localhost:<backend-port-number>
 Frontend: http://localhost:<frontend-port-number>
 
-📁 Project Structure
-text
+Project Structure
+
 AI-Interview-Platform/
 ├── backend/                 # Spring Boot API
 │   ├── src/main/java/
@@ -68,7 +69,7 @@ AI-Interview-Platform/
 │   └── package.json
 ├── docs/                    # API Documentation
 └── README.md
-🔧 Environment Variables
+Environment Variables
 Create .env files in both frontend and backend:
 
 Backend application.properties:
@@ -79,7 +80,8 @@ spring.datasource.username=your_username
 spring.datasource.password=your_password
 gemini.api.key=your_gemini_api_key
 jwt.secret=your_jwt_secret
-🎯 For Contributors
+
+For Contributors
 Fork the repository
 
 Create feature branch (git checkout -b feature/amazing-feature)
