@@ -93,6 +93,8 @@ Open Pull Request
 Live Demo Link: 
 https://drive.google.com/file/d/1OoWG3jjl4ts71jadX8e1V2oFh5lmf1A3/view?usp=sharing
 
+the live server is currently paused because the free hosting tier ran out, and that the project can be run locally with Docker
+
 ## Deployment
 
 - **Backend Deployment**: Render
